@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: conversao-temperatura
-        image: fabricioveronez/guia-jenkins:{{tag}}
+        image: fabricioveronez/guia-jenkins:${TAG_VERSION}
         ports:
         - containerPort: 8080
 ---
@@ -29,4 +29,5 @@ spec:
   - port: 80
     targetPort: 8080
   type: LoadBalancer
+
 
