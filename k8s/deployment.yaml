@@ -29,22 +29,3 @@ spec:
   - port: 80
     targetPort: 8080
   type: ClusterIP
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: conversao-temperatura-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-  - host: conversao.temperatura.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: conversao-temperatura
-            port:
-              number: 80
