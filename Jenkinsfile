@@ -28,7 +28,7 @@ pipeline {
         stage('Deploy no Kubernetes') {
             environment {
                 tag_version = "${env.BUILD_ID}"
-                KUBECONFIG = '/home/licia/.minikube/config'
+                KUBECONFIG = '/var/lib/jenkins/.kube/config'
             }
             steps {
                 sh "sed -i 's/{{tag}}/${tag_version}/g' ./k8s/deployment.yaml"
