@@ -1,69 +1,32 @@
-# === NAMESPACE ===
-# Um namespace é como uma "pasta" ou "área de trabalho" no Kubernetes.
-# Aqui criamos um para isolar todos os recursos desse projeto.
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: projeto-temperatura-namespace-service
----
-# === DEPLOYMENT ===
-# O Deployment gerencia a criação e atualização dos pods (containers).
-# Ele garante que sempre tenhamos 2 instâncias rodando do nosso app.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: conversao-temperatura
-  namespace: projeto-temperatura-namespace-service # Coloca o deployment dentro do namespace
-  labels:
-    app: conversao-temperatura # Rótulo usado pra identificar o app
-    tier: backend              # Camada da arquitetura (backend = parte de trás)
 spec:
-  replicas: 2 # Quantas cópias do container devem estar rodando
+  replicas: 2
   selector:
     matchLabels:
-      app: conversao-temperatura # Define quais pods esse deployment vai gerenciar
+      app: conversao-temperatura
   template:
     metadata:
       labels:
-        app: conversao-temperatura # Labels nos pods também
-        tier: backend
+        app: conversao-temperatura
     spec:
       containers:
       - name: conversao-temperatura
-        image: liciasantos/guia-jenkins:{{tag}} # Imagem do Docker (você pode substituir a tag depois)
-        imagePullPolicy: Always # Sempre baixa a imagem mais recente
+        image: liciasantos/guia-jenkins:{{tag}}
         ports:
-        - containerPort: 8080 # Porta onde o app roda dentro do container
-        resources:
-          limits:
-            memory: "512Mi" # Limite de memória RAM por container
-            cpu: "500m"     # Limite de CPU (50% de 1 CPU)
-        livenessProbe:
-          httpGet:
-            path: /         # Endpoint usado pra verificar se o app está vivo
-            port: 8080
-          initialDelaySeconds: 30 # Tempo pra começar a checar
-          periodSeconds: 10       # Intervalo entre as verificações
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 5  # Começa a verificar rápido
-          periodSeconds: 5        # Verifica a cada 5 segundos
+        - containerPort: 8080
 ---
-# === SERVICE ===
-# O Service expõe o app pra fora do cluster, pra você poder acessar ele no navegador
 apiVersion: v1
 kind: Service
 metadata:
   name: conversao-temperatura
-  namespace: projeto-temperatura-namespace-service
 spec:
   selector:
-    app: conversao-temperatura # Qual pod esse service vai direcionar o tráfego
+    app: conversao-temperatura
   ports:
-    - protocol: TCP
-      port: 80                 # Porta exposta no cluster
-      targetPort: 8080         # Porta no container
-      nodePort: 30080          # Porta aberta na máquina (nó) – ACESSO LOCAL
-  type: NodePort               # Tipo ideal pra ambiente local (Minikube)
+  - port: 80
+    targetPort: 8080
+    nodePort: 30080
+  type: NodePort
