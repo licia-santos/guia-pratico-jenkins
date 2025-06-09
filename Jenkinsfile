@@ -27,12 +27,13 @@ pipeline {
 
         stage('Deploy no Kubernetes') {
             steps {
-                withCredentials([file(credentialsId: 'kubeconfig-minikube', variable: 'KUBECONFIG')]) {
+                withCredentials([file(credentialsId: 'kubeconfig-minikube-inline', variable: 'KUBECONFIG')]) {
                     sh "sed -i 's/{{tag}}/${env.BUILD_ID}/g' ./k8s/deployment.yaml"
                     sh 'kubectl apply -f k8s/deployment.yaml'
                 }
             }
         }
+
     }
 }
 
