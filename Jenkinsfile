@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers {
-        pollSCM('')
-    }
-
     stages {
         stage('Build Docker Image') {
             steps {
@@ -26,14 +22,16 @@ pipeline {
         }
 
         stage('Deploy no Kubernetes') {
+            environment {
+                tag_version = "${env.BUILD_ID}"
+            }
             steps {
-                withCredentials([file(credentialsId: 'kubeconfig-minikube-inline', variable: 'KUBECONFIG')]) {
-                    sh "sed -i 's/{{tag}}/${env.BUILD_ID}/g' ./k8s/deployment.yaml"
+                withKubeConfig([credentialsId: 'kubeconfig']) {
+                    sh "sed -i 's/{{tag}}/${tag_version}/g' ./k8s/deployment.yaml"
                     sh 'kubectl apply -f k8s/deployment.yaml'
                 }
             }
         }
-
     }
-}
+
 
