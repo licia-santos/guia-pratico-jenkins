@@ -26,14 +26,13 @@ pipeline {
         }
 
         stage('Deploy no Kubernetes') {
-            environment {
-                tag_version = "${env.BUILD_ID}"
-                KUBECONFIG = '/var/lib/jenkins/.kube/config'
-            }
             steps {
-                sh "sed -i 's/{{tag}}/${tag_version}/g' ./k8s/deployment.yaml"
-                sh 'kubectl apply -f k8s/deployment.yaml'
+                withCredentials([file(credentialsId: 'kubeconfig-minikube', variable: 'KUBECONFIG')]) {
+                    sh "sed -i 's/{{tag}}/${env.BUILD_ID}/g' ./k8s/deployment.yaml"
+                    sh 'kubectl apply -f k8s/deployment.yaml'
+                }
             }
         }
     }
 }
+
